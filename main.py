@@ -8,12 +8,18 @@ Updated by Russell Adams, 2011/01/24 to support Python 3 and Combobox.
 Updated by Dominic Kexel to use tkinter and ttk instead of tkinter and tkinter.ttk
    Licensed same as original (not specified?), or public domain, whichever is less restrictive.
 """
+from time import sleep
+
+import win32com.client as comclt
+from win32gui import GetWindowText, GetForegroundWindow, FindWindow, FindWindowEx
+
 import sys
 import tkinter
 from tkinter import ttk
 from os import listdir, mkdir, system, startfile
 from os.path import isfile, join, isdir, basename
 from pprint import pprint
+import pyautogui
 
 import uuid
 from shutil import copyfile
@@ -203,6 +209,21 @@ def test(first_list, customer_names, needle="", needle_second=""):
                 customer_name_dir = elem
         customer_name_dir = join(customer_name_dir,"Prints",combo2.get())
         startfile(customer_name_dir)
+        sleep(5)
+        #title = GetWindowText(GetForegroundWindow())
+        #wsh = FindWindowEx(GetForegroundWindow())
+        #wsh = comclt.Dispatch("WScript.Shell")
+        #wsh.AppActivate(title)
+        #print(title)
+        #wsh.SendKeys("{F11}")
+
+        # select another application
+        # send the keys you want
+        pyautogui.click()
+        pyautogui.hotkey('ctrl', 'l')
+        #pyautogui.keyDown("ctrl")
+        #pyautogui.press("L")
+        #pyautogui.keyUp("ctrl")
 
 
     open_btn = tkinter.Button(root, text="Open PDF", command=open_btn_callback)
@@ -234,3 +255,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+    #wsh = comclt.Dispatch("WScript.Shell")
+    #wsh.AppActivate("AcroExch.AVDoc")  # select another application
+    #wsh.SendKeys("a")  # send the keys you want
+
