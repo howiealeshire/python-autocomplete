@@ -223,21 +223,24 @@ def test(first_list, customer_names, needle="", needle_second=""):
     else:
         combo2.current(needle_index2)
 
-    def callback(eventObject):
-        customer_name_dir = combo.get()
+    def get_customer_print_names(customer_name_dir):
         for elem in first_list:
             if basename(elem) == customer_name_dir:
                 customer_name_dir = elem
         customer_name_dir = join(customer_name_dir, "Prints")
         onlyfiles = [f for f in listdir(customer_name_dir) if isfile(join(customer_name_dir, f))]
-        combo2.set_completion_list(onlyfiles)
+        return onlyfiles
+
+    def callback(eventObject):
+        customer_name_dir = combo.get()
+        combo2.set_completion_list(get_customer_print_names(customer_name_dir))
 
 
-    combo_lbl2 = tkinter.Label(root, text="PRG#: ", font="Verdana 30 bold")
+    combo_lbl2 = tkinter.Label(root, text="DWG #: ", font="Verdana 30 bold")
     combo_lbl2.pack()
     combo2.pack()
     combo2.focus_set()
-
+    combo2.set_completion_list(get_customer_print_names(combo.get()))
     def open_btn_callback():
         customer_name_dir = combo.get()
         for elem in first_list:
@@ -266,6 +269,12 @@ def test(first_list, customer_names, needle="", needle_second=""):
     open_btn.pack()
     # I used a tiling WM with no controls, added a shortcut to quit
     combo.bind("<<ComboboxSelected>>", callback)
+    combo.bind("<Return>", callback)
+    combo.bind("<Tab>", callback)
+
+    combo2.bind("<<ComboboxSelected>>", callback)
+    combo.bind("<Return>", callback)
+    combo.bind("<Tab>", callback)
 
     root.bind('<Control-Q>', lambda event=None: root.destroy())
     root.bind('<Control-q>', lambda event=None: root.destroy())
@@ -274,8 +283,10 @@ def test(first_list, customer_names, needle="", needle_second=""):
 
 
 def main():
-    file_to_copy = "dummy.pdf"
-    customer_names_dir = "AccuCoat Info/Customer Information"
+    f = open("customer_file_path.txt", "r")
+    customer_names_dir = f.read()
+    f.close()
+    #customer_names_dir = "AccuCoat Info/Customer Information"
     customer_names = [dI for dI in listdir(customer_names_dir) if isdir(join(customer_names_dir, dI))]
     full_customer_paths = []
     for customer_name in customer_names:
