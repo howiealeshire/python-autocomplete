@@ -37,6 +37,8 @@ Requirements:
  *  4.) After closing the PDF viewer, main interface window reappears, remembering the user's selections, and
  *  allows them to keep inputting file selections for Print or DWG Number (though, of course, they should be able to edit the first
  *  field as well, since it seems like a simple enough interface)
+ *  5.) Make font size and combo buttons big enough to see
+
 """
 
 
@@ -155,14 +157,42 @@ class AutocompleteCombobox(ttk.Combobox):
         # list at the position of the autocompletion
 
 
+class FullScreenApp(object):
+    def __init__(self, master, **kwargs):
+        self.master=master
+        pad=3
+        self._geom='500x500+0+0'
+        master.geometry("{0}x{1}+0+0".format(
+            master.winfo_screenwidth()-pad, master.winfo_screenheight()-pad))
+        master.bind('<Escape>',self.toggle_geom)
+    def toggle_geom(self,event):
+        geom=self.master.winfo_geometry()
+        print(geom,self._geom)
+        self.master.geometry(self._geom)
+        self._geom=geom
+
+
+
 def test(first_list, customer_names, needle="", needle_second=""):
     """Run a mini application to test the AutocompleteEntry Widget."""
     root = tkinter.Tk(className=' AutocompleteEntry demo')
+    #root.geometry("500x500")  # You want the size of the app to be 500x500
+    #root.attributes("-fullscreen", True)
+    app = FullScreenApp(root)
+
+
+
+
+
+    """
     entry = AutocompleteEntry(root)
     entry.set_completion_list(customer_names)
     entry.pack()
     entry.focus_set()
-    combo = AutocompleteCombobox(root)
+    """
+    combo_lbl = tkinter.Label(root, text="Customer Name: ",font="Verdana 30 bold")
+    combo_lbl.pack()
+    combo = AutocompleteCombobox(root,font="Verdana 30")
 
     combo.set_completion_list(customer_names)
     combo.pack()
@@ -170,16 +200,20 @@ def test(first_list, customer_names, needle="", needle_second=""):
 
     needle_index = 0
     if (needle != ""):
-        needle_index = first_list.index(needle)
+        for elem in first_list:
+            if needle in basename(elem):
+                needle_index = first_list.index(elem)
 
     combo.current(needle_index)
 
     # ---------------------------
-
+    """
     entry2 = AutocompleteEntry(root)
     entry2.pack()
     entry2.focus_set()
-    combo2 = AutocompleteCombobox(root)
+    """
+
+    combo2 = AutocompleteCombobox(root , font="Verdana 30")
 
     needle_index2 = 0
     if (needle_second != ""):
@@ -197,8 +231,10 @@ def test(first_list, customer_names, needle="", needle_second=""):
         customer_name_dir = join(customer_name_dir, "Prints")
         onlyfiles = [f for f in listdir(customer_name_dir) if isfile(join(customer_name_dir, f))]
         combo2.set_completion_list(onlyfiles)
-        entry2.set_completion_list(onlyfiles)
 
+
+    combo_lbl2 = tkinter.Label(root, text="PRG#: ", font="Verdana 30 bold")
+    combo_lbl2.pack()
     combo2.pack()
     combo2.focus_set()
 
@@ -209,7 +245,7 @@ def test(first_list, customer_names, needle="", needle_second=""):
                 customer_name_dir = elem
         customer_name_dir = join(customer_name_dir,"Prints",combo2.get())
         startfile(customer_name_dir)
-        sleep(5)
+        #sleep(1)
         #title = GetWindowText(GetForegroundWindow())
         #wsh = FindWindowEx(GetForegroundWindow())
         #wsh = comclt.Dispatch("WScript.Shell")
@@ -234,8 +270,6 @@ def test(first_list, customer_names, needle="", needle_second=""):
     root.bind('<Control-Q>', lambda event=None: root.destroy())
     root.bind('<Control-q>', lambda event=None: root.destroy())
 
-
-
     root.mainloop()
 
 
@@ -250,7 +284,7 @@ def main():
     #    full_prints_path = join(full_customer_path,"Prints")
 
     pprint(full_customer_paths)
-    test(full_customer_paths, customer_names)
+    test(full_customer_paths, customer_names,"Edmund")
 
 
 if __name__ == '__main__':
